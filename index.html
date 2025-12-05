@@ -639,6 +639,8 @@
             z-index: -999; /* Asegurar que esté por debajo de todo */
             /* Mantenemos la escala normal para la captura (1.0) */
             transform: scale(1.0); 
+            /* Se añade un estilo para asegurar la visibilidad en el DOM temporalmente */
+            visibility: hidden; 
         }
         
         /* Ajustes de tipografía para parecer documento formal */
@@ -1821,11 +1823,12 @@
             const totalHoras = usuarioActual.registros.reduce((acc, r) => acc + r.horas, 0);
             
             const logsOrdenados = [...usuarioActual.registros].sort((a, b) => {
-                const [da, ma, ya] = a.fecha.split('/').map(Number);
-                const [db, mb, yb] = b.fecha.split('/').map(Number);
-                const dateA = new Date(ya, ma - 1, da);
-                const dateB = new Date(yb, mb - 1, db);
-                return dateA - dateB; // Orden ascendente por fecha
+                // Función de comparación para ordenar por fecha (D/M/A)
+                const parseDate = (dateStr) => {
+                    const [d, m, y] = dateStr.split('/').map(Number);
+                    return new Date(y, m - 1, d);
+                };
+                return parseDate(a.fecha) - parseDate(b.fecha); // Orden ascendente por fecha
             });
 
             let htmlContent = `
@@ -1875,9 +1878,15 @@
             const paperElement = document.getElementById('hidden-paper-a4');
             // INYECTAR CONTENIDO
             paperElement.innerHTML = htmlContent;
+            
+            // FORZAR VISIBILIDAD TEMPORALMENTE para ayudar a html2canvas a renderizar
+            paperElement.style.visibility = 'visible'; 
+            paperElement.style.position = 'static';
+            // Trigger reflow: Aunque el timeout ya lo hace, esto ayuda a veces
+            window.getComputedStyle(paperElement).height; 
+
 
             // 3. CONFIGURACIÓN DEL PDF 
-            
             const html2canvasScale = 3.0; 
             const name = `${usuarioActual.nombre}_${usuarioActual.apellido}`.replace(/\s/g, '_');
             const filename = `Informe_Pasantia_${name}.pdf`;
@@ -1904,18 +1913,21 @@
             
 
             // 4. GENERAR Y DESCARGAR CON PEQUEÑO RETARDO (SOLUCIÓN AL PDF VACÍO)
-            setTimeout(() => { // Añadimos un pequeño timeout
+            setTimeout(() => { // Mantenemos el timeout para compatibilidad
                 html2pdf().set(options).from(paperElement).save().then(() => {
                     mostrarError("✅ Descarga del informe finalizada.");
                 }).catch(error => {
                     console.error("Error al generar PDF:", error);
-                    mostrarError("❌ Error al generar PDF. Intenta de nuevo.");
+                    mostrarError("❌ Error al generar PDF. Asegúrate de tener registros válidos.");
                 }).finally(() => {
-                    // 5. REHABILITAR EL BOTÓN SIEMPRE
+                    // 5. REHABILITAR EL BOTÓN Y OCULTAR ELEMENTO
                     btn.disabled = false;
                     btn.style.opacity = 1.0;
-                    // Limpiar el contenido de la capa oculta después de usar
+                    
+                    // Ocultar correctamente el elemento después de usarlo
                     paperElement.innerHTML = '';
+                    paperElement.style.visibility = 'hidden'; 
+                    paperElement.style.position = 'absolute';
                 });
             }, 50); 
         }
