@@ -702,6 +702,15 @@
                 margin: 0;
             }
         }
+        
+        /* --- ESTILO PARA EL COPYRIGHT --- */
+        .copyright-info {
+            text-align: center;
+            font-size: 11px;
+            color: var(--card-info-lbl);
+            margin-top: 20px;
+            padding-bottom: 10px; /* Espacio extra al final */
+        }
     </style>
 </head>
 <body>
@@ -965,7 +974,11 @@
                         Cerrar Sesión
                     </button>
                 </div>
-            </div>
+                
+                <div class="copyright-info">
+                    &copy; 2025 M.F.A. | Versión v1.1.0
+                </div>
+                </div>
         </section>
         
         <div class="modal-overlay" id="modal-registro">
@@ -1978,11 +1991,10 @@
             inputElement.value = ''; // Limpiar input
         }
         
-       // --- Registro del Service Worker para el modo Offline ---
+        // --- Registro del Service Worker para el modo Offline ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // CORREGIDO: la ruta es solo 'sw.js' y el navegador lo encuentra
-                // Asumiendo que tu archivo HTML se ejecuta con el nombre 'index.html' o similar
+                // IMPORTANTE: Asegúrate de tener el archivo 'sw.js' en la misma carpeta.
                 navigator.serviceWorker.register('sw.js') 
                     .then(registration => {
                         console.log('Service Worker registrado con éxito:', registration.scope);
@@ -1996,4 +2008,4 @@
         }
     </script>
 </body>
-</html> 
+</html>
