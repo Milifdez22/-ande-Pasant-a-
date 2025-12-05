@@ -1,7 +1,7 @@
 // Nombre del caché. Incrementa el número si has cambiado assets o el HTML.
-const CACHE_NAME = 'nande-pasantia-cache-v4'; 
+const CACHE_NAME = 'nande-pasantia-cache-v6'; 
 // Aseguramos que 'index.html' se llama correctamente en tu proyecto.
-const APP_SHELL = 'index (3).html'; // <-- Corregido para coincidir con tu nombre de archivo
+const APP_SHELL = 'index.html'; // <-- Corregido para coincidir con tu nombre de archivo
 
 // Lista de archivos para cachear.
 const urlsToCache = [
